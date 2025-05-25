@@ -30,6 +30,11 @@ const router = createRouter({
       component: () => import('../views/PasswordChange.vue'),
     },
     {
+      path: '/feedback',
+      name: 'feedback',
+      component: () => import('../views/HomeView_4.vue'),
+    },
+    {
       path: '/c',
       name: 'c',
       component: () => import('../views/HomeView_3.vue'),

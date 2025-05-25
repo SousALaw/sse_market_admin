@@ -1,30 +1,65 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { getPosts, getPostsNum } from '@/api/browse/adminGet.js'
-import { deletePost, isHighQuality, removeHighQuality, muteUser, releaseUser} from '@/api/browse/controlPost.js'
+import { getPosts } from '@/api/browse/adminGet.js';
+import { deletePost, isHighQuality, removeHighQuality, muteUser } from '@/api/browse/controlPost.js';
 
 // 预设数据
 const items = ref([
-  { id: 1, title: '帖子1', content: '这是帖子1的发帖人', status: '已发布' },
+  { id: 1, title: '帖子1', user_id: 123, status: '已发布' },
 ]);
 
-const searchId = ref(''); // 增加搜索ID的响应式变量
+// 搜索结果相关的响应式变量
+const searchId = ref(''); // 搜索框绑定的变量
+const searchTitle = ref(''); // 标题搜索绑定的变量
+const searchUser_id = ref(''); // 发帖人搜索绑定的变量
 
-// 筛选状态
+// 筛选条件
 const filterStatus = ref('全部');
 
-// 筛选后的帖子列表
-const filteredItems = computed(() => {
+// 筛选后的帖子列表（不考虑分页）
+const allFilteredItems = computed(() => {
   let result = items.value;
-  const idNumber = parseInt(searchId.value); // 将 searchId 转换为数字
-    if (!isNaN(idNumber)) {
-      result = result.filter(item => item.id === idNumber);
-    }
-  // 根据状态过滤
+  const idNumber = parseInt(searchId.value);
+
+  // 按搜索框中的ID筛选
+  if (!isNaN(idNumber)) {
+    result = result.filter(item => item.id === idNumber);
+  }
+
+  // 按搜索框中的标题筛选
+  if (searchTitle.value) {
+    result = result.filter(item => item.title.toLowerCase().includes(searchTitle.value.toLowerCase()));
+  }
+
+  // 按搜索框中的发帖人筛选
+  if (searchUser_id.value) {
+    result = result.filter(item => item.id === idNumber);
+  }
+
+
+  // 根据状态筛选
   if (filterStatus.value !== '全部') {
     result = result.filter(item => item.status === filterStatus.value);
   }
+
   return result;
+});
+
+// 当前页码
+const currentPage = ref(1);
+// 每页显示的记录数
+const pageSize = ref(13);
+
+// 总页数
+const totalPages = computed(() => {
+  return Math.ceil(allFilteredItems.value.length / pageSize.value);
+});
+
+// 当前页的帖子
+const filteredItemsOnCurrentPage = computed(() => {
+  const startIndex = (currentPage.value - 1) * pageSize.value;
+  const endIndex = startIndex + pageSize.value;
+  return allFilteredItems.value.slice(startIndex, endIndex);
 });
 
 // 切换优质贴状态
@@ -69,22 +104,29 @@ const handleDelete = async (id: number) => {
 
 // 禁言发帖人
 const handleMute = async (id: number) => {
-  if (confirm('确定要禁言这个发帖人')){
-    if (!confirm('不是哥们，真禁言啊？')) return
+  if (confirm('确定要禁言这个发帖人')) {
+    if (!confirm('不是哥们，真禁言啊？')) return;
     alert(`已禁言发帖人：${items.value.find(item => item.id === id)?.title}`);
   }
-  
 };
 
-//获取后端帖子数据
+// 获取后端帖子数据
 const fetchItems = async () => {
   try {
     const response = await getPosts();
     items.value = response;
     console.log('后端返回的数据:', items.value); // 打印后端返回的数据
+    currentPage.value = 1; // 重置当前页为第一页
   } catch (error) {
     console.error('获取数据时出错:', error);
     alert('获取数据失败，请稍后再试');
+  }
+};
+
+// 页码改变处理函数
+const handlePageChange = (newPage: number) => {
+  if (newPage >= 1 && newPage <= totalPages.value) {
+    currentPage.value = newPage;
   }
 };
 
@@ -100,6 +142,8 @@ onMounted(() => {
 
       <div class="search-container">
         <input type="number" v-model.number="searchId" placeholder="输入ID搜索">
+        <input type="text" v-model="searchTitle" placeholder="输入标题搜索">
+        <input type="text" v-model="searchUser_id" placeholder="输入发帖人搜索">
       </div>
 
       <div class="filter-container">
@@ -124,16 +168,13 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in filteredItems" :key="item.id">
+            <tr v-for="item in filteredItemsOnCurrentPage" :key="item.id">
               <td>{{ item.id }}</td>
               <td>{{ item.title }}</td>
-              <td>{{ item.content }}</td>
+              <td>{{ item.user_id }}</td>
               <td>{{ item.status }}</td>
               <td>
-                <button 
-                  class="quality-btn" 
-                  @click="toggleQuality(item.id)"
-                >
+                <button class="quality-btn" @click="toggleQuality(item.id)">
                   {{ item.status === '已发布' ? '设为优质贴' : '取消优质贴' }}
                 </button>
                 <button class="mute-btn" @click="handleMute(item.id)">禁言发帖人</button>
@@ -143,6 +184,27 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button
+          :disabled="currentPage === 1"
+          @click="handlePageChange(currentPage - 1)"
+          class="pagination-btn prev-btn"
+        >
+          上一页
+        </button>
+        <span class="pagination-info">
+          {{ currentPage }} / {{ totalPages }} 
+        </span>
+        <button
+          :disabled="currentPage === totalPages"
+          @click="handlePageChange(currentPage + 1)"
+          class="pagination-btn next-btn"
+        >
+          下一页
+        </button>
       </div>
     </div>
   </div>
@@ -200,6 +262,7 @@ h1 {
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   outline: none;
+  margin-right: 10px;
 }
 
 .table-wrapper {
@@ -260,12 +323,45 @@ button {
   color: white;
 }
 
+.delete-btn:hover {
+  background-color: #cf1322;
+}
+
 .top-btn {
   background-color: #429891;
   color: white;
 }
 
-.delete-btn:hover {
-  background-color: #cf1322;
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.pagination-btn {
+  margin: 0 5px;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.pagination-btn:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  margin: 0 15px;
+  font-size: 14px;
+  color: #666;
 }
 </style>

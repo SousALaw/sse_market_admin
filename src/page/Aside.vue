@@ -8,6 +8,9 @@
         <router-link to="/keymanage" active-class="active">邀请码管理</router-link>
       </li>
       <li class="menu-item">
+        <router-link to="/feedback" active-class="active">反馈建议</router-link>
+      </li>
+      <li class="menu-item">
         <router-link to="/c" active-class="active">禁言管理</router-link>
       </li>
     </ul>

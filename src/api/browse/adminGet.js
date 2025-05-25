@@ -86,4 +86,24 @@ async function getKeys() {
         return null
     }
 }
-export { getPosts, getPostsNum, getKeys };
+async function getFeedback() {
+    try {
+        const res = await requestFunc(
+            `/getfeedback`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: {},
+            },
+            true
+        );
+        const data = await res.json();
+        return data;
+    } catch (e) {
+        console.error(e);
+        return null
+    }
+}
+export { getPosts, getPostsNum, getKeys, getFeedback };
