@@ -1,6 +1,5 @@
 ![image-20240402094632607](https://sse-market-source-1320172928.cos.ap-guangzhou.myqcloud.com/blog/image-20240402094632607.png)
 
-# README.md
 
 # 软工集市，软工人定义的世界
 
