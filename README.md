@@ -1,54 +1,117 @@
 ![image-20240402094632607](https://sse-market-source-1320172928.cos.ap-guangzhou.myqcloud.com/blog/image-20240402094632607.png)
 
+# README.md
+
 # 软工集市，软工人定义的世界
 
 ### 项目介绍
 
-SSE_MARKET是一个跨校区的学院内部交流平台，主要以论坛的形式为软工师生提供自由交流和信息汇集的半匿名空间，可在上面看帖、搜索、发帖、评论、回复、点赞等，提供宽松、平等的交流氛围，致力于消除学院内部的信息差以及促进数字文化传承。
+SSE_MARKET 是一个跨校区的学院内部交流平台，主要以论坛的形式为软工师生提供自由交流和信息汇集的半匿名空间，可在上面看帖、搜索、发帖、评论、回复、点赞等，提供宽松、平等的交流氛围，致力于消除学院内部的信息差以及促进数字文化传承。
 
-SSE_MARKET又称软工集市，主要由21级本科生组成的 SSE_MARKET小组负责设计、开发、部署和维护，它脱胎于软件中级实训课，并在学院的支持下逐步发展，现注册加入师生约 400人，学生包括大一到大四本科生以及各级研究生，教师包括行政老师、技术老师到专业老师等。
+SSE_MARKET 又称软工集市，主要由 21 级本科生组成的 SSE_MARKET 小组负责设计、开发、部署和维护，它脱胎于软件中级实训课，并在学院的支持下逐步发展，现注册加入师生约 400 人，学生包括大一到大四本科生以及各级研究生，教师包括行政老师、技术老师到专业老师等。
 
-[软工集市成功交接，欢迎新任成员 – SSE_MARKET博客 (ssemarket.cn)](https://ssemarket.cn/2024/04/02/软工集市成功交接，欢迎新任成员/)
+[软工集市成功交接，欢迎新任成员 – SSE_MARKET 博客 (ssemarket.cn)](https://ssemarket.cn/2024/04/02/%E8%BD%AF%E5%B7%A5%E9%9B%86%E5%B8%82%E6%88%90%E5%8A%9F%E4%BA%A4%E6%8E%A5%EF%BC%8C%E6%AC%A2%E8%BF%8E%E6%96%B0%E4%BB%BB%E6%88%90%E5%91%98/)
 
-在2024.3.6，软工集市正式完成交接。现在的软工集市由22级和23级本科生组成的新小组负责开发、部署、优化、维护。
+在 2024.3.6，软工集市正式完成交接。现在的软工集市由 22 级和 23 级本科生组成的新小组负责开发、部署、优化、维护。
 
 [官方博客](https://ssemarket.cn)
-# admin
 
-This template should help get you started developing with Vue 3 in Vite.
+# 管理员端介绍
 
-## Recommended IDE Setup
+## 运营背景与功能概述
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+为了满足运营组在实际工作中的需求，我们特别开发了管理员端。该端旨在为运营团队提供高效便捷的管理工具，以确保平台内容的优质与规范。主要功能包括帖子的增删改查、优质帖子的设定、邀请码的管理等。
 
-## Type Support for `.vue` Imports in TS
+### 帖子管理
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+管理员可以通过直观的界面完成帖子的创建、删除、修改和查询操作。无论是日常内容维护还是处理违规内容，都能迅速响应。此外，还设有专门的筛选功能，可按时间、类别等多种维度查看帖子，方便进行精细化管理。
 
-## Customize configuration
+### 优质帖子设定
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+为了鼓励高质量内容的创作与传播，管理员有权将优秀帖子标记为 “优质帖子”。被标记的帖子将在前端展示时获得特殊标识，吸引更多用户关注与互动。
 
-## Project Setup
+### 邀请码管理
 
-```sh
-npm install
-```
+邀请码是控制新用户注册节奏的重要手段。管理员可在后台批量生成、分配、启用或禁用邀请码。
 
-### Compile and Hot-Reload for Development
+## 开发环境配置
 
-```sh
-npm run dev
-```
+以下是搭建开发环境的步骤：
 
-### Type-Check, Compile and Minify for Production
+1. 克隆项目仓库
 
-```sh
+   ```bash
+   git clone <repository-url>
+   cd admin-frontend
+   ```
+
+2. 安装依赖
+
+   ```bash
+   npm install
+   ```
+
+3. 启动开发服务器
+
+   ```bash
+   npm run dev
+   ```
+
+4. 配置后端 API 地址
+
+   在 `src/config/api.js` 中修改 `BASE_API_URL` 为你本地或测试环境的后端服务地址。
+
+## 项目运行与测试
+
+### 开发模式
+
+开发模式下，项目会开启热加载功能。当修改代码时，页面会自动刷新并应用最新更改。通过浏览器访问 `http://localhost:3000` 即可查看效果。
+
+### 生产构建
+
+运行以下命令进行生产环境构建：
+
+```bash
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+构建后的文件会输出到 `dist` 目录，可将其部署到服务器或 CDN 上。
 
-```sh
+### 单元测试
+
+使用 Vitest 运行单元测试：
+
+```bash
 npm run test:unit
 ```
+
+测试结果会以详细报告形式展示，帮助开发者快速定位问题。
+
+## 技术栈
+
+- **前端框架**：Vue 3，采用 Composition API 提供高效的组件开发体验。
+- **后端框架**：Gin，语法简洁且优雅，支持中间件、路由组等特性，能够快速构建API服务。
+- **UI 组件库**：Element Plus，丰富的组件满足各类管理界面需求。
+- **状态管理**：Pinia，轻量且功能强大的 Vuex 替代方案。
+- **路由管理**：Vue Router，支持模块化路由配置与懒加载。
+- **构建工具**：Vite，极速的开发服务器与构建性能。
+- **测试框架**：Vitest，与 Vite 深度集成的测试解决方案。
+
+## 贡献指南
+
+欢迎各位开发者为项目贡献代码或提出改进建议。以下是贡献步骤：
+
+1. Fork 本仓库到你的个人账号。
+2. 创建新分支进行开发：`git checkout -b feature-branch`
+3. 完成开发后，提交代码并推送至远程仓库。
+4. 提交 Pull Request 至主仓库的 `dev` 分支，并详细描述变更内容。
+
+感谢每一位参与者的贡献！
+
+## 致谢
+
+感谢所有支持软工集市发展的师生，以及为项目提供技术指导的老师们。特别鸣谢项目初期提供宝贵意见的学长学姐们，你们的经验分享为我们指明了方向。
+
+感谢 Vue.js 社区提供的优秀开源工具，以及 Vite、Volar、Vitest 等项目的开发者们。你们的努力让前端开发变得更加高效与愉悦。
+
+---
