@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import {getFeedback} from '@/api/browse/adminGet.js';
-// import {getFeedback} from '@/api/browse/adminGetFeedback.js';
+
+// 定义反馈数据的接口
+interface FeedbackItem {
+  id: number;
+  text: string;
+  time: string;
+}
 
 // 建议数据
-const feedbacks = ref([
+const feedbacks = ref<FeedbackItem[]>([
   { id: 1, text: '网站加载速度有点慢，建议优化', time: '2023-10-01 14:30:00' },
 ]);
 
 // 筛选条件
-const filterContent = ref('');
+const filterContent = ref<string>('');
 
 // 当前页码
-const currentPage = ref(1);
+const currentPage = ref<number>(1);
 
 // 每页显示数量
-const pageSize = ref(13);
+const pageSize = ref<number>(13);
 
 // 总页数
 const totalPages = computed(() => {
@@ -44,10 +50,16 @@ const goToPage = (page: number) => {
   currentPage.value = page;
 };
 
-// 获取后端建议数据
+// 获取后端建议数据并处理
 const fetchFeedbacks = async () => {
   try {
-    const response = await getFeedback();
+    const response: FeedbackItem[] = await getFeedback(); // 使用接口明确类型
+    // 原始数据处理：删除相邻且内容相同的反馈（保留ID较小的那条）
+    for (let i = response.length - 1; i > 0; i--) { // 从后往前比较，避免索引错乱
+      if (response[i].text === response[i - 1].text) {
+        response.splice(i, 1);
+      }
+    }
     feedbacks.value = response;
     console.log('后端返回的数据:', feedbacks.value);
   } catch (error) {
