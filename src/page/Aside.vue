@@ -25,7 +25,7 @@
             :key="index"
             :class="['carousel-item', { active: currentImageIndex === index }]"
           >
-            <img :src="image" :alt="'Carousel image ' + (index + 1)">
+            <img :src="image" :alt="'Carousel image ' + (index + 1)" @click="enlargeImage(image)">
           </div>
         </div>
         
@@ -46,6 +46,14 @@
         </div>
       </div>
     </div>
+    
+    <!-- 图片放大模态框 -->
+    <div v-if="showEnlarged" class="image-modal" @click="closeEnlarged">
+      <div class="modal-content" @click.stop>
+        <button class="close-btn" @click="closeEnlarged">&times;</button>
+        <img :src="enlargedImageUrl" :alt="'Enlarged image'" class="enlarged-image">
+      </div>
+    </div>
   </aside>
 </template>
 
@@ -61,12 +69,14 @@ export default {
         { path: '/c', icon: '⛔', title: '禁言管理' }
       ],
       carouselImages: [
-          'https://i.pixiv.re/c/540x540_70/img-master/img/2022/07/27/20/00/11/100034965_p0_master1200.jpg',
-          'https://embed.pixiv.net/spotlight.php?id=10941&lang=zh',
-          'https://embed.pixiv.net/spotlight.php?id=10900&lang=zh'
+          new URL(`${import.meta.env.BASE_URL}dangan.jpg`, window.location.origin).pathname,
+          new URL(`${import.meta.env.BASE_URL}dfproject.jpg`, window.location.origin).pathname,
+          new URL(`${import.meta.env.BASE_URL}moon.jpg`, window.location.origin).pathname,
       ],
       currentImageIndex: 0,
-      carouselInterval: null
+      carouselInterval: null,
+      showEnlarged: false,
+      enlargedImageUrl: ''
     }
   },
   methods: {
@@ -94,6 +104,17 @@ export default {
       if (!this.carouselInterval) {
         this.startCarousel();
       }
+    },
+    // 放大图片 - 修复：传递正确的图片URL
+    enlargeImage(imageUrl) {
+      this.enlargedImageUrl = imageUrl;
+      this.showEnlarged = true;
+      this.pauseCarousel();
+    },
+    // 关闭放大图片
+    closeEnlarged() {
+      this.showEnlarged = false;
+      this.resumeCarousel();
     }
   },
   mounted() {
@@ -225,10 +246,13 @@ export default {
   height: 100%;
   opacity: 0;
   transition: opacity 0.5s ease;
+  pointer-events: none; /* 非激活项不响应点击 */
 }
 
 .carousel-item.active {
   opacity: 1;
+  z-index: 1; /* 置于顶层，确保点击命中当前项 */
+  pointer-events: auto; /* 仅激活项可点击 */
 }
 
 .carousel-item img {
@@ -236,6 +260,12 @@ export default {
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.carousel-item img:hover {
+  transform: scale(1.02);
 }
 
 .carousel-control {
@@ -290,6 +320,79 @@ export default {
   transform: scale(1.2);
 }
 
+/* 图片放大模态框样式 - 修复：限制图片最大尺寸为70% */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 90vw; /* 限制模态框最大宽度 */
+  max-height: 90vh; /* 限制模态框最大高度 */
+}
+
+.close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  z-index: 1001;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.enlarged-image {
+  max-width: 70vw; /* 限制图片最大宽度为视口宽度的70% */
+  max-height: 70vh; /* 限制图片最大高度为视口高度的70% */
+  object-fit: contain; /* 保持原图比例 */
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: zoomIn 0.3s ease;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .sidebar {
@@ -341,6 +444,17 @@ export default {
   .carousel-indicator {
     width: 6px;
     height: 6px;
+  }
+  
+  /* 移动端模态框调整 */
+  .enlarged-image {
+    max-width: 85vw; /* 移动端可以稍微大一些 */
+    max-height: 85vh;
+  }
+  
+  .close-btn {
+    top: -35px;
+    right: -10px;
   }
 }
 </style>
